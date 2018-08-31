@@ -1,0 +1,142 @@
+pa_define(250,250,1200,planar,none,electrostatic,)
+
+electrode(1){								;DEFINES THE GROUNDED HOUSING OF UNIT
+	locate(0,0,0,1,0,0,0){
+		fill{
+			within{
+				cylinder(125,125,1200,100,100,1100)
+			}
+			notin{
+				cylinder(125,125,1198,98,98,1096)
+			}
+		}
+	}
+}
+
+electrode(2){								;CATHODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+			within{
+				cylinder(125,125,900,2,2,10)
+			}
+		}
+	}
+}
+
+electrode(3){								;CATHODE PLATE
+	locate(0,0,0,1,0,0,0){
+		fill{
+			within{
+				cylinder(125,125,900,90,90,10)
+			}
+			notin{
+				cylinder(125,125,900,10,10,10)
+			}
+		}
+	}
+}
+
+electrode(4){								;ANODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+
+			within{
+				cylinder(125,125,850,90,90,10)
+			}
+			notin{
+				cylinder(125,125,850,15,15,10)
+			}
+		}
+	}
+}
+
+electrode(5){								;ANODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+
+			within{
+				cylinder(125,125,800,90,90,10)
+			}
+			notin{
+				cylinder(125,125,800,25,25,10)
+			}
+		}
+	}
+}
+
+electrode(6){								;ANODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+
+			within{
+				cylinder(125,125,750,90,90,10)
+			}
+			notin{
+				cylinder(125,125,750,25,25,10)
+			}
+		}
+	}
+}
+
+electrode(7){								;ANODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+
+			within{
+				cylinder(125,125,700,90,90,10)
+			}
+			notin{
+				cylinder(125,125,700,25,25,10)
+			}
+		}
+	}
+}
+
+electrode(8){								;ANODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+
+			within{
+				cylinder(125,125,650,90,90,10)
+			}
+			notin{
+				cylinder(125,125,650,25,25,10)
+			}
+		}
+	}
+}
+
+electrode(11){								;ANODE
+	locate(0,0,0,1,0,0,0){
+		fill{
+
+			within{
+				cylinder(125,125,440,90,90,10)
+			}
+			notin{
+				cylinder(125,125,440,25,25,10)
+			}
+		}
+	}
+}
+
+electrode(12){								;SWEEPER+
+	locate(0,0,0,1,0,0,0){
+		fill{
+			within{
+				corner_box3d(100,145,230,50,50,10)
+			}
+		}
+	}
+}
+
+electrode(13){								;SWEEPER-
+	locate(0,0,0,1,0,0,0){
+		fill{
+			within{
+				corner_box3d(100,55,230,50,50,10)
+			}
+		}
+	}
+}
+
