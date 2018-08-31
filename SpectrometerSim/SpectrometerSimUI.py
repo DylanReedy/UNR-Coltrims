@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QSizePolicy
+# from PyQt5.QtWidgets import QSizePolicy
 from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -89,9 +89,9 @@ class Ui_MainWindow(object):
         self.delayInput.setGeometry(QtCore.QRect(inputXPos, inputYPos, inputWidths, inputHeights))
         self.delayInput.setAlignment(QtCore.Qt.AlignCenter)
         self.delayInput.setObjectName("delayInput")
-        self.rampLabel = QtWidgets.QLabel(self.centralwidget)
 
         inputYPos += inputHeights + widgetYSpacing
+        self.rampLabel = QtWidgets.QLabel(self.centralwidget)
         self.rampLabel.setGeometry(QtCore.QRect(inputXPos, inputYPos, inputWidths, inputHeights))
         self.rampLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.rampLabel.setObjectName("rampLabel")
@@ -101,6 +101,19 @@ class Ui_MainWindow(object):
         self.rampInput.setGeometry(QtCore.QRect(inputXPos, inputYPos, inputWidths, inputHeights))
         self.rampInput.setAlignment(QtCore.Qt.AlignCenter)
         self.rampInput.setObjectName("rampInput")
+        
+        inputYPos += inputHeights + widgetYSpacing
+        self.fitLabel = QtWidgets.QLabel(self.centralwidget)
+        self.fitLabel.setGeometry(QtCore.QRect(inputXPos, inputYPos, inputWidths, inputHeights))
+        self.fitLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.fitLabel.setObjectName("fitLabel")
+
+        inputYPos += inputHeights + widgetYSpacing
+        self.fitValue = QtWidgets.QLineEdit(self.centralwidget)
+        self.fitValue.setGeometry(QtCore.QRect(inputXPos, inputYPos, inputWidths, inputHeights))
+        self.fitValue.setAlignment(QtCore.Qt.AlignCenter)
+        self.fitValue.setObjectName("fitValue")
+        self.fitValue.setReadOnly(True)
 
         self.canvas = PlotCanvas(MainWindow,width=plotWidth, height=plotHeight)
         self.canvas.move(20,20)
@@ -117,6 +130,7 @@ class Ui_MainWindow(object):
         self.fieldLabel.setText(_translate("MainWindow", "Field Strength"))
         self.delayLabel.setText(_translate("MainWindow", "Delay"))
         self.rampLabel.setText(_translate("MainWindow", "Ramp"))
+        self.fitLabel.setText(_translate("MainWindow", "Fit"))
 
 class PlotCanvas(FigureCanvas):
  
@@ -126,17 +140,15 @@ class PlotCanvas(FigureCanvas):
         self.setParent(parent)
         self.axes = self.figure.add_subplot(111)
  
-        FigureCanvas.setSizePolicy(self,
-                QSizePolicy.Expanding,
-                QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self) 
 
  
-    def plot(self,x,y,desc='r.'):
+    def plot(self,x,y,title,desc='r.',x_label='tof ($\mu$s)',y_label='mom (au)'):
 
         self.axes.plot(x,y,desc)
-        self.axes.set_xlabel('tof ($\mu$s)')
-        self.axes.set_ylabel('pos (mm)')
+        self.axes.set_xlabel(x_label)
+        self.axes.set_ylabel(y_label)
+        self.axes.set_title(title)
         self.draw()
 
     def clear(self):
@@ -145,13 +157,13 @@ class PlotCanvas(FigureCanvas):
 def simulate(simulator,ui):
     ui.canvas.clear()
     try:
-        simulator.spectrometer.mass_in_amu = int(ui.massInput.text())
+        simulator.SetMass(int(ui.massInput.text()))
     except:
-        ui.massInput.setText(str(simulator.spectrometer.mass_in_amu))
+        ui.massInput.setText(str(simulator.particle_mass_amu))
     try:
-        simulator.spectrometer.charge_in_amu = int(ui.chargeInput.text())
+        simulator.SetCharge(int(ui.chargeInput.text()))
     except:
-        ui.chargeInput.setText(str(simulator.spectrometer.charge_in_e))
+        ui.chargeInput.setText(str(simulator.particle_charge_C))
     try:
         simulator.spectrometer.E_max = int(ui.fieldInput.text())
     except:
@@ -166,13 +178,16 @@ def simulate(simulator,ui):
         ui.delayInput.setText(str(eformat(simulator.spectrometer.ramp,3,1)))
 
     simulator.Simulate()
-    ui.canvas.plot(simulator.data['tof']*10**6,np.sqrt(simulator.data['x']**2 + simulator.data['y']**2)*10**3)
-    ui.canvas.plot(simulator.polyFitX,simulator.polyFitY,'b-')
+    plot(simulator,ui)
+
+def plot(simulator,ui):
+    pz = simulator.Get_Pz_o()
+    ui.canvas.plot(simulator.data['tof']*10**6,pz,'Mass: ' + str(simulator.particle_mass_amu))
+    ui.canvas.plot(simulator.polyFitX*10**6,simulator.polyFitY,'Mass: ' + str(simulator.particle_mass_amu),'b-')
 
 def eformat(f, prec, exp_digits):
     s = "%.*e"%(prec, f)
     mantissa, exp = s.split('e')
-    # add 1 to digits as 1 is taken by sign +/-
     return "%se%+0*d"%(mantissa, exp_digits+1, int(exp))
 
 if __name__ == "__main__":
@@ -181,8 +196,8 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     simulator = IonSim()
-    ui.massInput.setText(str(simulator.spectrometer.mass_in_amu))
-    ui.chargeInput.setText(str(simulator.spectrometer.charge_in_e))
+    ui.massInput.setText(str(simulator.particle_mass_amu))
+    ui.chargeInput.setText(str(simulator.particle_charge_C))
     ui.fieldInput.setText(str(simulator.spectrometer.E_max))
     ui.delayInput.setText(str(eformat(simulator.spectrometer.delay,3,1)))
     ui.rampInput.setText(str(eformat(simulator.spectrometer.ramp,3,1)))
